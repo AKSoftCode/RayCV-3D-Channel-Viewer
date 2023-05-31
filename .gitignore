@@ -1,0 +1,46 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Folders
+
+x64/
+!**/opencv/build/x64
+!**/opencv/build/x64/**/opencv_world460d.lib
+!**/opencv/build/x64/**/opencv_world460.lib
+
+/.vs
+/packages
+**/SourceImages/
+**/bin/**
+/Alpha3D/imgui.ini
+/Resources/SourceImages

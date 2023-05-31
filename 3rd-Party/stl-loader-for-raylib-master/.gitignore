@@ -1,0 +1,6 @@
+.idea
+cmake-build-debug
+*.obj
+*.o
+.vscode
+build-vscode
