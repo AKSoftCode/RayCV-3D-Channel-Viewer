@@ -1,6 +1,6 @@
 # 3D Viewer
 
-This is a 3D Viewer Application that uses OpenCV to split an image into four channels and applies thresholding techniques to each channel individually.
+This is a 3D Viewer Application using Raylib and imgui that uses OpenCV to split an image into four channels and applies thresholding techniques to each channel individually.
 
 Steps to Run:
 
