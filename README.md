@@ -1,6 +1,6 @@
 # RayCV 3D Channel Viewer: Interactive Image Analysis with Raylib, ImGui, and OpenCV
 
-This is a 3D Viewer Application using Raylib and imgui that uses OpenCV to split an image into four channels and applies thresholding techniques to each channel individually.
+This is a cutting-edge 3D Viewer Application developed using Raylib and imgui. This innovative application harnesses the power of OpenCV to meticulously dissect images into four distinct channels. By applying advanced thresholding techniques to each individual channel, the application unveils nuanced insights into image compositions. Whether for artistic exploration, scientific analysis, or creative endeavors, RayCV 3D Channel Viewer empowers users to gain a deeper understanding of image content through a captivating visual experience.
 
 Steps to Run:
 
