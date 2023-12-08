@@ -110,34 +110,34 @@ void RayLibEngine::CheckUIStates()
 {
 	switch (states_)
 	{
-		case UIStates::eFilesNotFound:
-		{
-			layersStartupText = "Files Not Found!!";
-			bLoadAgain = false;
-			SetNoOfLayers(-1);
-			currentLayerIndex = -1;
-		}
-		break;
-		case UIStates::eLayerBeforeLoad:
-		{
-			layersStartupText = "Nothing to load !!";
-			bLoadAgain = false;
-			SetNoOfLayers(-1);
-			currentLayerIndex = -1;
-		}
-		break;
-		case UIStates::eLayersLoaded:
-		{
-			layersStartupText = "Loaded";
-			bLoadAgain = false;
-		}
-		break;
-		case UIStates::eLayersLoading:
-		{
-			layersStartupText = "Layers Loading in Progress....";
-			bLoadAgain = true;
-		}
-		break;
+	case UIStates::eFilesNotFound:
+	{
+		layersStartupText = "Files Not Found!!";
+		bLoadAgain = false;
+		SetNoOfLayers(-1);
+		currentLayerIndex = -1;
+	}
+	break;
+	case UIStates::eLayerBeforeLoad:
+	{
+		layersStartupText = "Nothing to load !!";
+		bLoadAgain = false;
+		SetNoOfLayers(-1);
+		currentLayerIndex = -1;
+	}
+	break;
+	case UIStates::eLayersLoaded:
+	{
+		layersStartupText = "Loaded";
+		bLoadAgain = false;
+	}
+	break;
+	case UIStates::eLayersLoading:
+	{
+		layersStartupText = "Layers Loading in Progress....";
+		bLoadAgain = true;
+	}
+	break;
 	}
 }
 
@@ -146,7 +146,7 @@ Texture2D RayLibEngine::LoadChannelImage(const std::string& path)
 	Texture2D chTexture = { 0 };
 
 	Image image = LoadImage(path.c_str());
-	ImageColorTint(&image, {64,100,128});
+	ImageColorTint(&image, { 64,100,128 });
 	if (image.data != NULL)
 	{
 		chTexture = LoadTextureFromImage(image);
@@ -188,6 +188,8 @@ void RayLibEngine::InitMultiLayerModel(const char* imageZipFilePath, const  char
 	{
 		states_ = UIStates::eFilesNotFound;
 
+		folderWatchSource = true;
+
 		getLayerImageInstance().StartFileWatcherService(fileWatcherPath_);
 	}
 	else
@@ -195,6 +197,8 @@ void RayLibEngine::InitMultiLayerModel(const char* imageZipFilePath, const  char
 		states_ = UIStates::eFilesNotFound;
 
 		getLayerImageInstance().StopFileWatcherService();
+
+		folderWatchSource = false;
 
 		LoadFromZip();
 	}
@@ -246,7 +250,7 @@ RayLibEngine::RayLibEngine()
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontDefault();
 
-	auto & ls = getLayerImageInstance();
+	auto& ls = getLayerImageInstance();
 	ls.Update(ts_);
 
 	// merge in icons from Font Awesome
@@ -263,7 +267,7 @@ RayLibEngine::~RayLibEngine()
 	Cleanup();
 
 	UnloadTexture(textureGrid_);
-	
+
 	CloseWindow();        // Close window and OpenGL context
 }
 
@@ -278,7 +282,7 @@ void RayLibEngine::Cleanup()
 		std::lock_guard<std::mutex> lk(layersMut_);
 		layers_.clear();
 	}
-	
+
 	bAChSelected = true;
 	bBChSelected = true;
 	bGChSelected = true;
@@ -362,13 +366,13 @@ void RayLibEngine::Render()
 	else
 	{
 		if (bLoadAgain)
-		{	
+		{
 			{
 				std::lock_guard<std::mutex> lk(layersCacheMut_);
 				if (!layerFiles_.empty())
 					SetNoOfLayers((--layerFiles_.end())->first);
 			}
-				
+
 			bLoadAgain = false;
 		}
 
@@ -376,7 +380,7 @@ void RayLibEngine::Render()
 
 		if (topThreadshold && bottomThreadshold)
 		{
-			layerViewRange_ = { 0, noOfLayers };	
+			layerViewRange_ = { 0, noOfLayers };
 		}
 		else if (topThreadshold)
 		{
@@ -445,7 +449,7 @@ void RayLibEngine::CreateModelInstances(int fromLayers, int tolayers)
 	{
 		if (tolayers > noOfLayers)
 			return;
-    
+
 		cmap<int, std::string> layersCacheTemp;
 		{
 			std::lock_guard<std::mutex> lk(layersCacheMut_);
@@ -469,7 +473,7 @@ void RayLibEngine::CreateModelInstances(int fromLayers, int tolayers)
 			if (layers_.find(i) == layers_.end())
 			{
 				lk.unlock();
-				
+
 				states_ = UIStates::eLayersLoading;
 
 				std::shared_ptr<SingleLayer> singleLayerModel = std::make_shared<SingleLayer>(layerPath.c_str(), i);
@@ -566,15 +570,19 @@ void RayLibEngine::ShowOverlayInformation(bool* p_open)
 			if (folderZipSwitch)
 			{
 				getLayerImageInstance().StartFileWatcherService(fileWatcherPath_);
+
+				folderWatchSource = true;
 			}
 			else
 			{
 				getLayerImageInstance().StopFileWatcherService();
 
+				folderWatchSource = false;
+
 				LoadFromZip();
-			}		
+			}
 		}
-		
+
 
 		if (ImGui::Button(ICON_MD_REFRESH, buttonsSize))
 		{
@@ -583,7 +591,7 @@ void RayLibEngine::ShowOverlayInformation(bool* p_open)
 				if (!layerFiles_.empty())
 					SetNoOfLayers((--layerFiles_.end())->first);
 			}
-			
+
 			currentLayerIndex = noOfLayers;
 			layerViewRange_ = { 0, noOfLayers };
 		}
@@ -597,7 +605,7 @@ void RayLibEngine::ShowOverlayInformation(bool* p_open)
 		{
 			ImGui::Text(layersStartupText);
 		}
-		else if(states_ == UIStates::eLayersLoaded)
+		else if (states_ == UIStates::eLayersLoaded)
 		{
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 			ImGui::Text("Total Layers: %d", noOfLayers);
@@ -784,7 +792,7 @@ void RayLibEngine::ShowRGBAControls(bool* p_open)
 		if (bRChSelected)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
-	
+
 			if (ImGui::Button("R", buttonsSize))
 			{
 				bRChSelected = false;
@@ -1037,11 +1045,11 @@ void RayLibEngine::ShowThreshodingSettings(bool* p_open)
 				int i = 0;
 
 				cmap<int, SPtr<SingleLayer>> tempMap;
-				{	
+				{
 					std::lock_guard<std::mutex> lk(layersMut_);
 					tempMap = layers_;
 				}
-				
+
 				for (auto& [index, layer] : tempMap)
 				{
 					if (!layer) continue;
@@ -1055,9 +1063,9 @@ void RayLibEngine::ShowThreshodingSettings(bool* p_open)
 			else
 			{
 				std::cout << "No Changes detected!! Nothing to load in Thresholding" << std::endl;
-			}		
+			}
 		}
-		
+
 		ImGui::PopStyleVar();
 	}
 	ImGui::End();
@@ -1072,44 +1080,44 @@ void RayLibEngine::FolderWatcherCallback(const std::wstring& path, const int ind
 	bIsFileWatcherEventActivated = true;
 	switch (events)
 	{
-		case FileWatcherEvents::initial:
-		{ 
-			if (layer.size() == 0)
-				states_ = UIStates::eFilesNotFound;
+	case FileWatcherEvents::initial:
+	{
+		if (layer.size() == 0)
+			states_ = UIStates::eFilesNotFound;
 
-			cmap<int, std::string> layersCacheTemp;
-			{
-				std::lock_guard<std::mutex> lk(layersCacheMut_);
-				layerFiles_ = layer;
-			}
-
-			states_ = UIStates::eLayersLoading;
-			break;
-		}
-		case FileWatcherEvents::added:
-		{		
-			states_ = UIStates::eLayersLoading;
-			std::string value = std::string(path.begin(), path.end());
-
-			{
-				std::lock_guard<std::mutex> lk(layersCacheMut_);
-				layerFiles_.emplace(index, value);
-			}
-			
-			break;
-		}
-		case FileWatcherEvents::removed:
+		cmap<int, std::string> layersCacheTemp;
 		{
-			{
-				std::lock_guard<std::mutex> lk(layersCacheMut_);
-			
-				layerFiles_.erase(index);
-			}
-
-			std::lock_guard<std::mutex> lk(layersMut_);
-			layers_.erase(index);
-			break;
+			std::lock_guard<std::mutex> lk(layersCacheMut_);
+			layerFiles_ = layer;
 		}
+
+		states_ = UIStates::eLayersLoading;
+		break;
+	}
+	case FileWatcherEvents::added:
+	{
+		states_ = UIStates::eLayersLoading;
+		std::string value = std::string(path.begin(), path.end());
+
+		{
+			std::lock_guard<std::mutex> lk(layersCacheMut_);
+			layerFiles_.emplace(index, value);
+		}
+
+		break;
+	}
+	case FileWatcherEvents::removed:
+	{
+		{
+			std::lock_guard<std::mutex> lk(layersCacheMut_);
+
+			layerFiles_.erase(index);
+		}
+
+		std::lock_guard<std::mutex> lk(layersMut_);
+		layers_.erase(index);
+		break;
+	}
 	}
 
 	bIsFileWatcherEventActivated = false;
@@ -1121,12 +1129,12 @@ void RayLibEngine::FolderWatcherCallback(const std::wstring& path, const int ind
 			int noOfLayer = (--layerFiles_.end())->first;
 			SetNoOfLayers(noOfLayer);
 			currentLayerIndex = noOfLayer;
-		}	
+		}
 		else
 		{
 			states_ = UIStates::eFilesNotFound;
 		}
-			
+
 
 		layerViewRange_ = { 0, noOfLayers };
 	}

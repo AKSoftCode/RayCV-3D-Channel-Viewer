@@ -177,30 +177,30 @@ void LayersCompression::RegisterForFileUpdates(CallbackFiler callback)
 
 void LayersCompression::FileWatcherEventActionCallback(const std::filesystem::path& path, const filewatch::Event change_type, const LayersFileMap layerMap)
 {
-	auto getIndexFromFileName = [](const std::string &fileName)
-	{
-		int index = 0;
-		string delimiter = "_";
-		size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-		string token;
-		vector<string> res;
-
-		InputImages inputImages;
-		while ((pos_end = fileName.find(delimiter, pos_start)) != string::npos) {
-			token = fileName.substr(pos_start, pos_end - pos_start);
-			pos_start = pos_end + delim_len;
-			res.push_back(token);
-		}
-
-		res.push_back(fileName.substr(pos_start));
-
-		if (res.size() != 3 && res.front() != "Layer")
+	auto getIndexFromFileName = [](const std::string& fileName)
 		{
-			throw std::logic_error("File format is wrong");
-		}
+			int index = 0;
+			string delimiter = "_";
+			size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+			string token;
+			vector<string> res;
 
-		return stoi(res.back());
-	};
+			InputImages inputImages;
+			while ((pos_end = fileName.find(delimiter, pos_start)) != string::npos) {
+				token = fileName.substr(pos_start, pos_end - pos_start);
+				pos_start = pos_end + delim_len;
+				res.push_back(token);
+			}
+
+			res.push_back(fileName.substr(pos_start));
+
+			if (res.size() != 3 && res.front() != "Layer")
+			{
+				throw std::logic_error("File format is wrong");
+			}
+
+			return stoi(res.back());
+		};
 
 	try
 	{
@@ -217,7 +217,7 @@ void LayersCompression::FileWatcherEventActionCallback(const std::filesystem::pa
 		case filewatch::Event::added:
 		{
 
-		    filewatcherCallback_(std::filesystem::path(fileWatcherPath_).append(path.string()), getIndexFromFileName(path.string()), FileWatcherEvents::added, layerMap);
+			filewatcherCallback_(std::filesystem::path(fileWatcherPath_).append(path.string()), getIndexFromFileName(path.string()), FileWatcherEvents::added, layerMap);
 			break;
 		}
 		case filewatch::Event::removed:
@@ -292,7 +292,7 @@ void LayersCompression::StopFileWatcherService()
 	{
 		std::filesystem::remove_all(tempDirPath);
 	}
-	
+
 }
 
 void LayersCompression::showSplitImages(std::string image)
@@ -380,7 +380,7 @@ Mat LayersCompression::readImage(std::string imageFileName, int flags)
 void LayersCompression::SplitImageIntoChannels(std::string baseImagePath, SplitCallback callback)
 {
 	try
-	{	
+	{
 		Mat sourceImage;//declaring a matrix to load the image//
 		Mat different_Channels[4];//declaring a matrix with four channels// 
 
@@ -442,7 +442,7 @@ bool CheckThreshold(int cIndex, const ThresholdSettings& ts)
 	return true;
 }
 
-bool SetupThreshold(int cIndex, cv::Mat & channel, const ThresholdSettings& ts)
+bool SetupThreshold(int cIndex, cv::Mat& channel, const ThresholdSettings& ts)
 {
 	if (cIndex == 1) return false;
 
@@ -528,11 +528,11 @@ Mat BuildMerged(int cIndex, cv::Mat& channel)
 
 
 bool LayersCompression::ProcessSplit(int cIndex, cv::Mat& channel, SplitCallback callback)
-{	
+{
 	if (!CheckThreshold(cIndex, tsApplied_)) return false;
 
 	if (cIndex != 1) SetupThreshold(cIndex, channel, tsApplied_);
-	
+
 	Mat mergedImage = BuildMerged(cIndex, channel);
 	auto imageData = matToBytes(mergedImage);
 
